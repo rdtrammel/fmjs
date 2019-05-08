@@ -47,5 +47,47 @@ As of now, I only have this fmconnect.js file that I created for the purpose of 
 
 I ultimately want to create a constructor for the openConnection() closeConnection() functions and set up callback scripts so that they can be used dynamically. I'm going to experiment with using Javascript classes, etc. But ultimately this needs to be supported by ie8+. Hence the XMLHttpRequests instead of ``fetch().then()`` and ``async / await``. My javascript skills are not the greatest so I would really appreciate any input, feedback, or even code that could improve this project.
 
+### Original Usage
+````
+var settings = {
+    host : "fcns.dallasisd.org",
+    file : "summer_food_sites_lookup",
+    auth : btoa(`${"username"}:${"password"}`)
+}
+var layout = "Sites";
+
+var find = {
+                "query" : [{
+                    "is_active" : 1
+                }],
+                "limit": "1000"
+            }
+
+findRecords(layout, find, callbackFunction);
+````
+
+### Ideal Usage:
+````
+var fm = new FMConnect({
+    host : "yourhost.com",
+    file : "filename",
+    user : "username",
+    pass : "password"
+});
+
+var layout = "Sites";
+
+var find = {
+    "query" : [{
+        "is_active" : 1
+    }],
+    "limit": "*"
+}
+
+fm.findRecords( layout, find, processResult );
+````
+
+Note: I don't want to leave a lingering connection. My goal here is to just open the connection, get the data, and get out. Maybe we can put something in so that if you want to open a lasting connection, you can do that. Like a ``settings { maintainConnection : true }`` type of thing.
+
 **Thank You**
 

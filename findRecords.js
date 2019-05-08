@@ -2,6 +2,7 @@
 function findRecords(layout, query, callback){
     settings.layout = layout;
     settings.query = query;
+    //Pass the function you want to run to process the results of the data fetch
     settings.callback = callback;
     openConnection();
 }

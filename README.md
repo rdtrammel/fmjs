@@ -1,4 +1,4 @@
-# Setting up your server for Cross Origin Support
+# Setting up your FileMaker server for Cross Origin Support (FMS 17 and lower)
 > Reference - https://msdev.co.uk/fms-cross-origin/
 ## *Windows Setup*
 1. Using the Web Platform Installer install the CORS module for IIS (if not already installed). You might have to restart the server (not just IIS) to complete this installation. Found [Here](https://www.iis.net/downloads/microsoft/iis-cors-module)

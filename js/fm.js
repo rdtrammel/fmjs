@@ -1,7 +1,7 @@
 class FMJS{
 
     constructor(settings){
-
+        
         this.host = settings.host || 'localhost';
         this.file = settings.file;
         this.auth = btoa(`${settings.user}:${settings.pass}`);
@@ -37,7 +37,6 @@ class FMJS{
             http.open('DELETE', url, true);
             http.setRequestHeader('Content-type', 'application/json');
             http.onreadystatechange = function() {
-                //console.log(`Close Connection - Ready State: [${http.readyState}] Status: [${http.status}]`);
                 if(http.readyState == 4 && http.status == 200) {
                     var json = JSON.parse(http.responseText);
                     settings.token = "";
@@ -48,7 +47,6 @@ class FMJS{
 
         this.performFind = function(layout, query){
             if (!this.token){
-                //We need to implement some kind of a max amount of tries situation
                 openConnection(performFind(layout, query));
             }
             let url = `https://${this.host}/fmi/data/v1/databases/${this.file}/layouts/${layout}/_find`;
@@ -70,10 +68,6 @@ class FMJS{
 
         var performFind = function(layout, query){
             return this.performFind(layout, query);
-        }
-
-        function validateFields(){
-
         }
     }
 }

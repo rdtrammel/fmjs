@@ -4,7 +4,6 @@ class FMJS{
         
         this.host = settings.host || 'localhost';
         this.file = settings.file;
-        this.auth = btoa(`${settings.user}:${settings.pass}`);
         this.token;
 
         this.openConnection = function(callback){
@@ -17,7 +16,7 @@ class FMJS{
                 var body = '{}';
                 http.open('POST', url, true);
                 http.setRequestHeader('Content-type', 'application/json');
-                http.setRequestHeader('Authorization', `Basic ${this.auth}`);
+                http.setRequestHeader('Authorization', `Basic ${btoa(settings.user+':'+settings.pass)}`);
                 http.onreadystatechange = function() {
                     if(http.readyState == 4 && http.status == 200) {
                         var json = JSON.parse(http.responseText);
@@ -31,7 +30,7 @@ class FMJS{
         }
 
         this.closeConnection = function(){
-            if (!settings.token) { console.log('Err - No token found.' ); return;}
+            if (!this.token) { console.log('Err - No token found.' ); return;}
             let url = `https://${this.host}/fmi/data/vLatest/databases/${this.file}/sessions/${settings.token}`;
             var http = new XMLHttpRequest();
             http.open('DELETE', url, true);
@@ -46,9 +45,7 @@ class FMJS{
         }
 
         this.performFind = function(layout, query){
-            if (!this.token){
-                openConnection(performFind(layout, query));
-            }
+            if (!this.token){ openConnection(performFind(layout, query));}
             let url = `https://${this.host}/fmi/data/v1/databases/${this.file}/layouts/${layout}/_find`;
             var http = new XMLHttpRequest();
             http.open('POST', url, true);

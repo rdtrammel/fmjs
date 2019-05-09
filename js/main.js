@@ -14,8 +14,9 @@ function go(){
         user : user,
         pass : pass
     });
-    
-    console.log(fmjs);
+
+    fmjs.performFind("Employees", {query : [{"fullName":"*"}]});
+
 }
 
 

@@ -1,3 +1,5 @@
+'use strict';
+
 class FMJS{
 
     constructor(settings){
@@ -24,7 +26,7 @@ class FMJS{
                             this.token = json.response.token;
                             callback;
                         } else {
-                            return `Unable to connect to the file ${this.file} on the host https://${this.host}`;
+                            console.log(`[Error: ${http.status}] Unable to connect to the file ${this.file} on the host https://${this.host}`);
                         }
                     }
                 }   
@@ -44,7 +46,7 @@ class FMJS{
                         var json = JSON.parse(http.responseText);
                         this.token = "";
                     }else{
-                        console.log(`Network Connection failed when attempting to close the file`);
+                        console.log(`[Error: ${http.status}] Network Connection failed when attempting to close the file`);
                     }
                 }
             }
@@ -52,7 +54,7 @@ class FMJS{
         }
 
         this.performFind = function(layout, query){
-            if (!this.token){ openConnection(performFind(layout, query));}
+            if (!this.token){ this.openConnection(this(layout,query)); return;}
             let url = `https://${this.host}/fmi/data/v1/databases/${this.file}/layouts/${layout}/_find`;
             var http = new XMLHttpRequest();
             http.open('POST', url, true);
@@ -64,7 +66,7 @@ class FMJS{
                         var json = JSON.parse(http.responseText);
                         json.response.data;
                         closeConnection();
-                        return json.response.data;
+                        console.table(json.response.data);
                     } else {
                         return `Http status: [${http.status}] ${http.statusText}`;
                     }
@@ -72,9 +74,6 @@ class FMJS{
             }
             http.send(JSON.stringify(settings.query));
         }
-
-        var performFind = function(layout, query){
-            return this.performFind(layout, query);
-        }
     }
+
 }

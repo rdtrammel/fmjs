@@ -18,13 +18,16 @@ class FMJS{
                 http.setRequestHeader('Content-type', 'application/json');
                 http.setRequestHeader('Authorization', `Basic ${btoa(settings.user+':'+settings.pass)}`);
                 http.onreadystatechange = function() {
-                    if(http.readyState == 4 && http.status == 200) {
-                        var json = JSON.parse(http.responseText);
-                        this.token = json.response.token;
-                        this.auth = "";
-                        callback;
+                    if(http.readyState == 4){
+                        if ( http.status == 200 ) {
+                            var json = JSON.parse(http.responseText);
+                            this.token = json.response.token;
+                            callback;
+                        } else {
+                            return `Unable to connect to the file ${this.file} on the host https://${this.host}`;
+                        }
                     }
-                }
+                }   
                 http.send(body);
             }
         }
@@ -36,9 +39,13 @@ class FMJS{
             http.open('DELETE', url, true);
             http.setRequestHeader('Content-type', 'application/json');
             http.onreadystatechange = function() {
-                if(http.readyState == 4 && http.status == 200) {
-                    var json = JSON.parse(http.responseText);
-                    settings.token = "";
+                if(http.readyState == 4){
+                    if(http.status == 200) {
+                        var json = JSON.parse(http.responseText);
+                        this.token = "";
+                    }else{
+                        console.log(`Network Connection failed when attempting to close the file`);
+                    }
                 }
             }
             http.send();
@@ -52,12 +59,15 @@ class FMJS{
             http.setRequestHeader('Content-Type', 'application/json');
             http.setRequestHeader('Authorization', `Bearer ${this.token}`);
             http.onreadystatechange = function() {
-                if(http.readyState == 4 && http.status == 200) {
-                    var json = JSON.parse(http.responseText);
-                    json.response.data;
-                    callback(json.response.data);
-                    console.log("Fetch Complete");
-                    closeConnection();
+                if(http.readyState == 4){
+                    if(http.status == 200) {
+                        var json = JSON.parse(http.responseText);
+                        json.response.data;
+                        closeConnection();
+                        return json.response.data;
+                    } else {
+                        return `Http status: [${http.status}] ${http.statusText}`;
+                    }
                 }
             }
             http.send(JSON.stringify(settings.query));
@@ -67,14 +77,4 @@ class FMJS{
             return this.performFind(layout, query);
         }
     }
-}
-
-
-
-function findRecords(layout, query, callback){
-    settings.layout = layout;
-    settings.query = query;
-    //Pass the function you want to run to process the results of the data fetch
-    settings.callback = callback;
-    openConnection();
 }

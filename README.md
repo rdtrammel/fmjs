@@ -91,3 +91,7 @@ Note: I don't want to leave a lingering connection. My goal here is to just open
 
 **Thank You**
 
+## Methods
+
+``findRecords(layout, query);``
+

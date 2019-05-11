@@ -54,7 +54,7 @@ class FMJS{
         }
 
         this.performFind = function(layout, query){
-            if (!this.token){ this.openConnection(this.performFind(layout,query)); return;}
+            if (!this.token){ this.openConnection(); return;}
             let url = `https://${this.host}/fmi/data/v1/databases/${this.file}/layouts/${layout}/_find`;
             var http = new XMLHttpRequest();
             http.open('POST', url, true);

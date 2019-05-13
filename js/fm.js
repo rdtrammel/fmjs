@@ -1,63 +1,62 @@
-class FMJS {
+function FMJS(settings) {
 
-    constructor(settings){
-        
-        this.host = settings.host || 'localhost';
-        this.file = settings.file;
-        this.token;
+    this.host = settings.host || 'localhost';
+    this.file = settings.file;
+    let token;
 
-    }
-
-    performFind(layout, query){
-        if (!this.token){ this.openConnection(this.performFind(layout, query)); return;}
-        let url = `https://${this.host}/fmi/data/v1/databases/${this.file}/layouts/${layout}/_find`;
-        var http = new XMLHttpRequest();
-        http.open('POST', url, true);
-        http.setRequestHeader('Content-Type', 'application/json');
-        http.setRequestHeader('Authorization', `Bearer ${this.token}`);
-        http.onreadystatechange = function() {
-            if(http.readyState == 4){
-                if(http.status == 200) {
-                    var json = JSON.parse(http.responseText);
-                    closeConnection();
-                    return json.response.data;
-                } else {
-                    return `Http status: [${http.status}] ${http.statusText}`;
-                }
-            }
-        }
-        http.send(JSON.stringify(query));
-    }
-
-    openConnection(callback){
-        if (1=0){
-            console.log("The Host, File, Username, and Password are missing,");
-            return "The Host, File, Username, and/or Password are missing.";
-        }else{;
-            let url = `https://${this.host}/fmi/data/vLatest/databases/${this.file}/sessions`;
-            var http = new XMLHttpRequest();
-            var body = '{}';
+    this.performFind = function(layout, query){
+        if (!token){ 
+            console.log("Open Connection");
+            settings.layout = layout;
+            settings.query = query;
+            openConnection(performFind(layout, query));
+            return;
+        } else {
+            console.log("Performing Find");
+            let url = `https://${settings.host}/fmi/data/v1/databases/${settings.file}/layouts/${layout}/_find`;
+            let http = new XMLHttpRequest();
             http.open('POST', url, true);
-            http.setRequestHeader('Content-type', 'application/json');
-            http.setRequestHeader('Authorization', `Basic ${btoa(settings.user+':'+settings.pass)}`);
+            http.setRequestHeader('Content-Type', 'application/json');
+            http.setRequestHeader('Authorization', `Bearer ${token}`);
             http.onreadystatechange = function() {
                 if(http.readyState == 4){
-                    if ( http.status == 200 ) {
+                    if(http.status == 200) {
                         var json = JSON.parse(http.responseText);
-                        this.token = json.response.token;
-                        callback;
+                        closeConnection();
+                        return json.response.data;
                     } else {
-                        console.log(`[Error: ${http.status}] Unable to connect to the file ${this.file} on the host https://${this.host}`);
+                        return `Http status: [${http.status}] ${http.statusText}`;
                     }
                 }
-            }   
-            http.send(body);
+            }
+            http.send(JSON.stringify(query));
         }
     }
 
-    closeConnection(){
+    openConnection = function(){
+        let url = `https://${settings.host}/fmi/data/vLatest/databases/${settings.file}/sessions`;
+        var http = new XMLHttpRequest();
+        var body = '{}';
+        http.open('POST', url, true);
+        http.setRequestHeader('Content-type', 'application/json');
+        http.setRequestHeader('Authorization', `Basic ${btoa(settings.user+':'+settings.pass)}`);
+        http.onreadystatechange = function() {
+            if(http.readyState == 4){
+                if ( http.status == 200 ) {
+                    var json = JSON.parse(http.responseText);
+                    token = json.response.token;
+                    this.performFind();
+                } else {
+                    console.log(`[Error: ${http.status}] Unable to connect to the file ${settings.file} on the host https://${settings.host}`);
+                }
+            }
+        }   
+        http.send(body);
+    }
+
+    closeConnection = function(){
         if (!this.token) { console.log('Err - No token found.' ); return;}
-        let url = `https://${this.host}/fmi/data/vLatest/databases/${this.file}/sessions/${settings.token}`;
+        let url = `https://${settings.host}/fmi/data/vLatest/databases/${settings.file}/sessions/${token}`;
         var http = new XMLHttpRequest();
         http.open('DELETE', url, true);
         http.setRequestHeader('Content-type', 'application/json');
@@ -65,7 +64,7 @@ class FMJS {
             if(http.readyState == 4){
                 if(http.status == 200) {
                     var json = JSON.parse(http.responseText);
-                    this.token = "";
+                    token = "";
                 }else{
                     console.log(`[Error: ${http.status}] Network Connection failed when attempting to close the file`);
                 }

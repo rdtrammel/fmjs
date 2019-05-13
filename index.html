@@ -17,6 +17,22 @@
             </div>
         </main>
     </body>
-    <script src="js/fm.js"></script>
-    <script src="js/main.js"></script>
+    <script src="./js/fm.js"></script>
+    <script>
+            function go(){
+            let host = document.querySelector('input[name="host"]').value;
+            let file = document.querySelector('input[name="file"]').value;
+            let user = document.querySelector('input[name="username"]').value;
+            let pass = document.querySelector('input[name="password"]').value;
+
+            let fmjs = new myClass({
+                host : host,
+                file : file, 
+                user : user, 
+                pass : pass
+            });
+
+            //fmjs.performFind("Employees", {query : [{"fullName":"*"}]});
+        }
+    </script>
 </html>

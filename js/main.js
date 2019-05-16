@@ -8,10 +8,10 @@ document.querySelector("button").addEventListener('click',()=>{
 
     let find = {
         query : [
-            {"field1" : "value1"},
-            {"field2" : "value2"},
-            {"etc" : "etc"}
+            {"is_active" : "1"}
         ]
     }
-    fm.performFind("layout", find);
+
+    fm.performFind("Sites", find);
+
 });

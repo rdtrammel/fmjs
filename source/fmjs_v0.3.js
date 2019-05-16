@@ -1,3 +1,4 @@
+//Functional, but not asynchronous, and you need to create a separate open method for each function you want to create. It's just..the worst.
 class FMJS{
 
     constructor(settings){

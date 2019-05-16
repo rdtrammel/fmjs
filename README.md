@@ -39,15 +39,18 @@ RewriteRule ^(.*)$ $1 [R=200,L]
 
     *The last three lines are necessary for the CORS preflight check. Essentially what happens when a browser goes to make a CORS request is that it issues an OPTIONS HTTP request, and then inspects the returned headers. The /fmi location is acting as a proxy to a component of FileMaker server which doesn’t know what to do with the OPTIONS method, so we use a simple rewrite rule to return a 200 ‘success’ status code. The always in the three headers being set means that they are also returned with the status code, so the browser knows what it’s allowed to do.*
 
-# FMConnect Ideation
+# FMJS Ideation
+(Rebranded 5/15/2019 from FMConnect)
 
-This is meant to give a simple library for scripting calls to the FileMaker Data API (Currently v17, soon v18) that can be done via a Javascript interface.
+This is meant to be a simple library for scripting calls to the FileMaker Data API (Currently v17, soon v18) that can be done via a Javascript interface.
 
 As of now, I only have this fmconnect.js file that I created for the purpose of performing a find. 
 
 I ultimately want to create a constructor for the openConnection() closeConnection() functions and set up callback scripts so that they can be used dynamically. I'm going to experiment with using Javascript classes, etc. But ultimately this needs to be supported by ie8+. Hence the XMLHttpRequests instead of ``fetch().then()`` and ``async / await``. My javascript skills are not the greatest so I would really appreciate any input, feedback, or even code that could improve this project.
 
-### Original Usage
+There are a lot of node.js files, but I don't understand why you have to create another node app, to talk to a node app, that will then in turn feed data to your web page. 
+
+### Original Usage - Working 
 ````
 var settings = {
     host : "fcns.dallasisd.org",
@@ -63,7 +66,7 @@ var find = {
                 "limit": "1000"
             }
 
-findRecords(layout, find, callbackFunction);
+findRecords(layout, find);
 ````
 
 ### Ideal Usage:
@@ -84,14 +87,15 @@ var find = {
     "limit": "*"
 }
 
-fm.findRecords( layout, find, processResult );
+fm.findRecords(layout, find);
 ````
+Note: The query follows FileMakers specifications for making a query, I in no way want to rewrite that.
 
-Note: I don't want to leave a lingering connection. My goal here is to just open the connection, get the data, and get out. Maybe we can put something in so that if you want to open a lasting connection, you can do that. Like a ``settings { maintainConnection : true }`` type of thing.
+Note: I don't want to leave a lingering connection. My goal here is to just open the connection, get the data, and get out. Maybe we can put something in so that if you want to open a lasting connection, you can do that. Perhaps a ``settings { maintainConnection : true }`` type of thing.
 
 **Thank You**
 
-## Methods
+## Methods (so far)
 
 ``findRecords(layout, query);``
 

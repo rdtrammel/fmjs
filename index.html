@@ -13,25 +13,10 @@
                 <label for="file">Database</label><input name="file"><br>
                 <label for="username">UserName</label><input name="username">
                 <label for="password" >Password</label><input type="password" name="password">
-                <button onclick="go()">Go</button>
+                <button>Go</button>
             </div>
         </main>
     </body>
-    <script src="./js/fm.js"></script>
-    <script>
-        function go(){
-            let host = document.querySelector('input[name="host"]').value;
-            let file = document.querySelector('input[name="file"]').value;
-            let user = document.querySelector('input[name="username"]').value;
-            let pass = document.querySelector('input[name="password"]').value;
-            let options = {
-                host : host,
-                file : file, 
-                user : user, 
-                pass : pass
-            }
-            let fmjs = new FMJS(options);
-            fmjs.performFind("Employees", {query : [{"fullName":"*"}]});
-        }
-    </script>
+    <script src="js/fm.js"></script>
+    <script src="js/main.js"></script>
 </html>

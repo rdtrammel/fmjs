@@ -1,76 +1,78 @@
-function FMJS(settings) {
+class FMJS{
 
-    this.host = settings.host || 'localhost';
-    this.file = settings.file;
-    let token;
+    constructor(settings){
+        this.host = settings.host;
+        this.file = settings.file;
+        this.auth = btoa(`${settings.user}:${settings.pass}`);
+    }
 
-    this.performFind = function(layout, query){
-        if (!token){ 
-            console.log("Open Connection");
-            settings.layout = layout;
-            settings.query = query;
-            openConnection(performFind(layout, query));
-            return;
+    performFind(layout, query){
+        if (!this.token){
+            this.openConnection(layout, query);
         } else {
-            console.log("Performing Find");
-            let url = `https://${settings.host}/fmi/data/v1/databases/${settings.file}/layouts/${layout}/_find`;
-            let http = new XMLHttpRequest();
+            console.log("Finding Records.");
+            let url = `https://${this.host}/fmi/data/v1/databases/${this.file}/layouts/${layout}/_find`;
+            var http = new XMLHttpRequest();
             http.open('POST', url, true);
             http.setRequestHeader('Content-Type', 'application/json');
-            http.setRequestHeader('Authorization', `Bearer ${token}`);
+            http.setRequestHeader('Authorization', `Bearer ${this.token}`);
             http.onreadystatechange = function() {
-                if(http.readyState == 4){
-                    if(http.status == 200) {
-                        var json = JSON.parse(http.responseText);
-                        closeConnection();
-                        return json.response.data;
-                    } else {
-                        return `Http status: [${http.status}] ${http.statusText}`;
-                    }
+                console.log(`Get Records - Ready State: [${http.readyState}] Status: [${http.status}]`);
+                if(http.readyState == 4 && http.status == 200) {
+                    var json = JSON.parse(http.responseText);
+                    json.response.data;
+                    settings.callback(json.response.data);
+                    console.log("Fetch Complete");
+                    closeConnection();
                 }
             }
-            http.send(JSON.stringify(query));
+            http.send(JSON.stringify(settings.query));
+            this.closeConnection();
         }
     }
 
-    openConnection = function(){
-        let url = `https://${settings.host}/fmi/data/vLatest/databases/${settings.file}/sessions`;
-        var http = new XMLHttpRequest();
-        var body = '{}';
+    openConnection(){
+        console.log("Connecting to FileMaker");
+        let url = `https://${this.host}/fmi/data/vLatest/databases/${this.file}/sessions`;
+        let http = new XMLHttpRequest();
+        let body = '{}';
         http.open('POST', url, true);
         http.setRequestHeader('Content-type', 'application/json');
-        http.setRequestHeader('Authorization', `Basic ${btoa(settings.user+':'+settings.pass)}`);
+        http.setRequestHeader('Authorization', `Basic ${this.auth}`);
         http.onreadystatechange = function() {
+            console.log(`Open Connection - Ready State: [${http.readyState}] Status: [${http.status}]`);
             if(http.readyState == 4){
-                if ( http.status == 200 ) {
+                if(http.status == 200) {
+                    console.log("Connection successful");
                     var json = JSON.parse(http.responseText);
-                    token = json.response.token;
-                    this.performFind();
+                    this.token = json.response.token;
+                    this.auth = "";
+                    this.performFind(arguments[0], arguments[1]);
                 } else {
-                    console.log(`[Error: ${http.status}] Unable to connect to the file ${settings.file} on the host https://${settings.host}`);
+                    console.log ("[Error: " + http.status + "] Something went wrong while trying to connect to Filemaker");
                 }
             }
-        }   
+        }
         http.send(body);
     }
 
-    closeConnection = function(){
-        if (!this.token) { console.log('Err - No token found.' ); return;}
-        let url = `https://${settings.host}/fmi/data/vLatest/databases/${settings.file}/sessions/${token}`;
-        var http = new XMLHttpRequest();
+    closeConnection(){
+        console.log("Closing Connection to FileMaker");
+        let url = `https://${settings.host}/fmi/data/vLatest/databases/${settings.file}/sessions/${settings.token}`;
+        let http = new XMLHttpRequest();
         http.open('DELETE', url, true);
         http.setRequestHeader('Content-type', 'application/json');
         http.onreadystatechange = function() {
+            console.log(`Close Connection - Ready State: [${http.readyState}] Status: [${http.status}]`);
             if(http.readyState == 4){
-                if(http.status == 200) {
-                    var json = JSON.parse(http.responseText);
-                    token = "";
-                }else{
-                    console.log(`[Error: ${http.status}] Network Connection failed when attempting to close the file`);
+                if(http.status == 200) { 
+                    this.token = "";
+                } else {
+                    console.log("Error " + http.status + "Something went wrong while trying to disconnect from Filemaker.");
                 }
             }
         }
         http.send();
-    }
+        }
 
 }

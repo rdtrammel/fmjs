@@ -53,8 +53,8 @@ There are a lot of node.js files, but I don't understand why you have to create 
 ### Original Usage - Working 
 ````
 var settings = {
-    host : "fcns.dallasisd.org",
-    file : "summer_food_sites_lookup",
+    host : "yourhost.com",
+    file : "filemakerfilename",
     auth : btoa(`${"username"}:${"password"}`)
 }
 var layout = "Sites";
